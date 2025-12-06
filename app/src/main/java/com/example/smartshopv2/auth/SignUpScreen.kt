@@ -76,7 +76,7 @@ fun SignUpScreen(navController: NavController) {
                                 "email" to email,
                                 "uid" to userId
                             )
-
+                            
                             if (userId != null) {
                                 db.collection("users").document(userId)
                                     .set(user)
