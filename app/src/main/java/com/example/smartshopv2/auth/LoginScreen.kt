@@ -1,4 +1,4 @@
-package com.example.smartshopv2
+package com.example.smartshopv2.auth
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -27,15 +27,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
-fun SignUpScreen(navController: NavController) {
+fun e(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
     val auth = FirebaseAuth.getInstance()
-    val db = FirebaseFirestore.getInstance()
 
     Column(
         modifier = Modifier
@@ -44,7 +42,7 @@ fun SignUpScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Sign Up", fontSize = 24.sp)
+        Text(text = "Login", fontSize = 24.sp)
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
@@ -68,42 +66,27 @@ fun SignUpScreen(navController: NavController) {
 
         Button(onClick = {
             if (email.isNotEmpty() && password.isNotEmpty()) {
-                auth.createUserWithEmailAndPassword(email, password)
+                auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            val userId = auth.currentUser?.uid
-                            val user = hashMapOf(
-                                "email" to email,
-                                "uid" to userId
-                            )
-                            
-                            if (userId != null) {
-                                db.collection("users").document(userId)
-                                    .set(user)
-                                    .addOnSuccessListener {
-                                        Toast.makeText(context, "Sign up successful", Toast.LENGTH_SHORT).show()
-                                        navController.navigate("home") {
-                                            popUpTo("signup") { inclusive = true }
-                                        }
-                                    }
-                                    .addOnFailureListener { e ->
-                                        Toast.makeText(context, "Database error: ${e.message}", Toast.LENGTH_SHORT).show()
-                                    }
+                            Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
+                            navController.navigate("home") {
+                                popUpTo("login") { inclusive = true }
                             }
                         } else {
-                            Toast.makeText(context, "Sign up failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                         }
                     }
             } else {
                 Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show()
             }
         }) {
-            Text("Sign Up")
+            Text("Login")
         }
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Already have an account? Login",
-            modifier = Modifier.clickable { navController.navigate("login") }
+            text = "Don't have an account? Sign up",
+            modifier = Modifier.clickable { navController.navigate("signup") }
         )
     }
 }
