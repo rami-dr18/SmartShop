@@ -4,17 +4,44 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.smartshopv2.auth.SignUpScreen
 import com.example.smartshopv2.auth.LoginScreen
-import com.example.smartshopv2.ui.HomeScreen
+import com.example.smartshopv2.data.local.AppDatabase
+import com.example.smartshopv2.data.repository.ProductRepository
+import com.example.smartshopv2.ui.screens.ProductFormScreen
+import com.example.smartshopv2.ui.screens.ProductListScreen
+import com.example.smartshopv2.ui.viewmodel.ProductViewModel
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun Navigation(innerPadding: PaddingValues) {
     val navController = rememberNavController()
+    val context = LocalContext.current
     
+    // Dependency Injection
+    val database = AppDatabase.getDatabase(context)
+    val repository = ProductRepository(
+        dao = database.productDao(),
+        firestore = FirebaseFirestore.getInstance()
+    )
+    
+    val viewModelFactory = object : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(ProductViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return ProductViewModel(repository) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
+    }
+
     // Navigation Host
     NavHost(
         navController = navController, 
@@ -27,8 +54,20 @@ fun Navigation(innerPadding: PaddingValues) {
         composable("login") {
             LoginScreen(navController = navController)
         }
-        composable("home") {
-            HomeScreen(navController = navController)
+        composable("productList") {
+            val productViewModel: ProductViewModel = viewModel(factory = viewModelFactory)
+            ProductListScreen(
+                viewModel = productViewModel,
+                onAddClick = { navController.navigate("productForm") },
+                onEditClick = { product -> /* Navigate to Edit Product Form with product */ }
+            )
+        }
+        composable("productForm") {
+            val productViewModel: ProductViewModel = viewModel(factory = viewModelFactory)
+            ProductFormScreen(
+                viewModel = productViewModel,
+                onSave = { navController.popBackStack() }
+            )
         }
     }
 }

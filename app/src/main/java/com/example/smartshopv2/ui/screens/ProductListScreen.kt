@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.smartshopv2.data.local.Product
 import com.example.smartshopv2.ui.viewmodel.ProductViewModel
 
@@ -17,7 +18,7 @@ import com.example.smartshopv2.ui.viewmodel.ProductViewModel
 fun ProductListScreen(
     viewModel: ProductViewModel = viewModel(),
     onAddClick: () -> Unit,
-    onEditClick: (Product) -> Unit
+    onEditClick: (Product) -> Unit,
 ) {
     val products by viewModel.products.collectAsState(initial = emptyList())
 

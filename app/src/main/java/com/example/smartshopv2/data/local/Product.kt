@@ -7,8 +7,8 @@ import java.util.UUID
 @Entity(tableName = "products")
 data class Product(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
-    val name: String,
-    val quantity: Int,
-    val price: Double,
+    val name: String = "",
+    val quantity: Int = 0,
+    val price: Double = 0.0,
     val updatedAt: Long = System.currentTimeMillis()
 )

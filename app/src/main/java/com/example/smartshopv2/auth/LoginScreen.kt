@@ -70,7 +70,8 @@ fun LoginScreen(navController: NavController) {
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
-                            navController.navigate("home") {
+                            // Corrected destination: Navigate to productList instead of home
+                            navController.navigate("productList") {
                                 popUpTo("login") { inclusive = true }
                             }
                         } else {

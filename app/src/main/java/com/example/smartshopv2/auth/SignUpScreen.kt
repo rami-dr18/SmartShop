@@ -82,7 +82,7 @@ fun SignUpScreen(navController: NavController) {
                                     .set(user)
                                     .addOnSuccessListener {
                                         Toast.makeText(context, "Sign up successful", Toast.LENGTH_SHORT).show()
-                                        navController.navigate("home") {
+                                        navController.navigate("productList") {
                                             popUpTo("signup") { inclusive = true }
                                         }
                                     }
