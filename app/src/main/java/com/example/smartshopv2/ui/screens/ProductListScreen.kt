@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.example.smartshopv2.data.local.Product
 import com.example.smartshopv2.ui.viewmodel.ProductViewModel
 
@@ -56,7 +55,8 @@ fun ProductListContent(
                 ProductRow(
                     product = product,
                     onClick = { onEditClick(product) },
-                    onDeleteClick = { onDeleteClick(product) }
+                    onDeleteClick = { onDeleteClick(product) },
+                    onEditClick = { onEditClick(product) }
                 )
             }
         }
@@ -67,7 +67,8 @@ fun ProductListContent(
 fun ProductRow(
     product: Product,
     onClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -79,13 +80,20 @@ fun ProductRow(
             modifier = Modifier.padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(text = product.name, style = MaterialTheme.typography.titleMedium)
                 Text(text = "Quantity: ${product.quantity}")
                 Text(text = "Price: \$${product.price}")
             }
-            Button(onClick = onDeleteClick) {
-                Text("Delete")
+            Row {
+                Button(onClick = onEditClick, modifier = Modifier.padding(end = 8.dp)) {
+                    Text("Edit")
+                }
+                Button(onClick = onDeleteClick) {
+                    Text("Delete")
+                }
             }
         }
     }

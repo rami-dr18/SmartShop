@@ -20,6 +20,11 @@ class ProductViewModel(private val repository: ProductRepository) : ViewModel() 
         }
         repository.startListeningForRemoteChanges()
     }
+
+    suspend fun getProductById(id: String): Product? {
+        return repository.getProductById(id)
+    }
+
     fun addProduct(name: String, quantity: Int, price: Double) {
         if (name.isBlank() || quantity < 0 || price <= 0.0) return
 

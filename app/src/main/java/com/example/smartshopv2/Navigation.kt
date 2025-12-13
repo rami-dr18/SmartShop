@@ -8,9 +8,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.smartshopv2.auth.SignUpScreen
 import com.example.smartshopv2.auth.LoginScreen
 import com.example.smartshopv2.data.local.AppDatabase
@@ -59,14 +61,24 @@ fun Navigation(innerPadding: PaddingValues) {
             ProductListScreen(
                 viewModel = productViewModel,
                 onAddClick = { navController.navigate("productForm") },
-                onEditClick = { product -> /* Navigate to Edit Product Form with product */ }
+                onEditClick = { product -> navController.navigate("productForm?productId=${product.id}") }
             )
         }
-        composable("productForm") {
+        composable(
+            route = "productForm?productId={productId}",
+            arguments = listOf(navArgument("productId") { 
+                nullable = true
+                defaultValue = null
+                type = NavType.StringType 
+            })
+        ) { backStackEntry ->
             val productViewModel: ProductViewModel = viewModel(factory = viewModelFactory)
-            ProductFormScreen(
+            val productId = backStackEntry.arguments?.getString("productId")
+             ProductFormScreen(
                 viewModel = productViewModel,
-                onSave = { navController.popBackStack() }
+                productId = productId,
+                onSave = { navController.popBackStack() },
+                onCancel = { navController.popBackStack() }
             )
         }
     }

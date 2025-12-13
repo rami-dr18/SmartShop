@@ -17,6 +17,11 @@ class ProductRepository(
     fun getAllProducts(): Flow<List<Product>> {
         return dao.getAllProducts()
     }
+    
+    suspend fun getProductById(id: String): Product? {
+        return dao.getProductById(id)
+    }
+    
     suspend fun addProduct(product: Product) {
         dao.insertProduct(product)
         pushToFirestore(product)

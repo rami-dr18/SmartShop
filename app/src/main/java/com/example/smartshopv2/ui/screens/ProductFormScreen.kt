@@ -18,41 +18,56 @@ import com.example.smartshopv2.data.local.Product
 @Composable
 fun ProductFormScreen(
     viewModel: ProductViewModel = viewModel(),
-    productToEdit: Product? = null,
-    onSave: () -> Unit
+    productId: String? = null,
+    onSave: () -> Unit,
+    onCancel: () -> Unit
 ) {
-    ProductFormContent(
-        productToEdit = productToEdit,
-        onSaveClick = { name, quantity, price ->
-            // Handle the database logic here
-            if (productToEdit != null) {
-                val updatedProduct = productToEdit.copy(
-                    name = name,
-                    quantity = quantity,
-                    price = price
-                )
-                viewModel.updateProduct(updatedProduct)
-            } else {
-                viewModel.addProduct(name, quantity, price)
-            }
-            // Navigate back
-            onSave()
+    var productToEdit by remember { mutableStateOf<Product?>(null) }
+    
+    LaunchedEffect(productId) {
+        if (productId != null) {
+            val product = viewModel.getProductById(productId)
+            productToEdit = product
         }
-    )
+    }
+
+    if (productId != null && productToEdit == null) {
+        // Loading state
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    } else {
+        ProductFormContent(
+            productToEdit = productToEdit,
+            onSaveClick = { name, quantity, price ->
+                if (productToEdit != null) {
+                    val updatedProduct = productToEdit!!.copy(
+                        name = name,
+                        quantity = quantity,
+                        price = price
+                    )
+                    viewModel.updateProduct(updatedProduct)
+                } else {
+                    viewModel.addProduct(name, quantity, price)
+                }
+                onSave()
+            },
+            onCancelClick = onCancel
+        )
+    }
 }
 
 // 2. The Stateless Content (UI Only - Safe to Preview)
 @Composable
 fun ProductFormContent(
     productToEdit: Product? = null,
-    onSaveClick: (String, Int, Double) -> Unit
+    onSaveClick: (String, Int, Double) -> Unit,
+    onCancelClick: () -> Unit
 ) {
-    // We keep the UI state (text field values) here because it belongs to the form UI
-    var name by remember { mutableStateOf(productToEdit?.name ?: "") }
-    var quantity by remember { mutableStateOf(productToEdit?.quantity?.toString() ?: "") }
-    var price by remember { mutableStateOf(productToEdit?.price?.toString() ?: "") }
+    var name by remember(productToEdit) { mutableStateOf(productToEdit?.name ?: "") }
+    var quantity by remember(productToEdit) { mutableStateOf(productToEdit?.quantity?.toString() ?: "") }
+    var price by remember(productToEdit) { mutableStateOf(productToEdit?.price?.toString() ?: "") }
 
-    // Validation logic
     val isValid = name.isNotBlank() &&
             quantity.toIntOrNull() != null && quantity.toInt() >= 0 &&
             price.toDoubleOrNull() != null && price.toDouble() > 0.0
@@ -91,15 +106,26 @@ fun ProductFormContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = {
-                // Pass the valid data back up to the parent
-                onSaveClick(name, quantity.toInt(), price.toDouble())
-            },
-            enabled = isValid,
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(if (productToEdit != null) "Update Product" else "Add Product")
+            OutlinedButton(
+                onClick = onCancelClick,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Cancel")
+            }
+            
+            Button(
+                onClick = {
+                    onSaveClick(name, quantity.toInt(), price.toDouble())
+                },
+                enabled = isValid,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(if (productToEdit != null) "Update" else "Add")
+            }
         }
     }
 }
@@ -112,7 +138,8 @@ fun ProductFormNewPreview() {
     MaterialTheme {
         ProductFormContent(
             productToEdit = null,
-            onSaveClick = { _, _, _ -> }
+            onSaveClick = { _, _, _ -> },
+            onCancelClick = {}
         )
     }
 }
@@ -131,7 +158,8 @@ fun ProductFormEditPreview() {
     MaterialTheme {
         ProductFormContent(
             productToEdit = sampleProduct,
-            onSaveClick = { _, _, _ -> }
+            onSaveClick = { _, _, _ -> },
+            onCancelClick = {}
         )
     }
 }
