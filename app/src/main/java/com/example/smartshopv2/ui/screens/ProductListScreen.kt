@@ -4,9 +4,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -73,26 +80,69 @@ fun ProductRow(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clickable { onClick() }
+            .padding(vertical = 6.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
+
+            // Product info
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text(text = product.name, style = MaterialTheme.typography.titleMedium)
-                Text(text = "Quantity: ${product.quantity}")
-                Text(text = "Price: \$${product.price}")
+                Text(
+                    text = product.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "Quantity: ${product.quantity}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Text(
+                    text = "Price: $${product.price}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
-            Row {
-                Button(onClick = onEditClick, modifier = Modifier.padding(end = 8.dp)) {
-                    Text("Edit")
+
+            // Action buttons
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+
+                IconButton(
+                    onClick = onEditClick
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit product",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                 }
-                Button(onClick = onDeleteClick) {
-                    Text("Delete")
+
+                IconButton(
+                    onClick = onDeleteClick
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete product",
+                        tint = MaterialTheme.colorScheme.error
+                    )
                 }
             }
         }
