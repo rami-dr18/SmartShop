@@ -122,27 +122,31 @@ fun ProductRow(
 
             // Action buttons
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
 
-                IconButton(
-                    onClick = onEditClick
-                ) {
+                TextButton(onClick = onEditClick) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit product",
-                        tint = MaterialTheme.colorScheme.primary
+                        contentDescription = "Edit product"
                     )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Edit")
                 }
 
-                IconButton(
-                    onClick = onDeleteClick
+                TextButton(
+                    onClick = onDeleteClick,
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete product",
-                        tint = MaterialTheme.colorScheme.error
+                        contentDescription = "Delete product"
                     )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Delete")
                 }
             }
         }
