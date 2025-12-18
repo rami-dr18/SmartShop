@@ -61,7 +61,8 @@ fun Navigation(innerPadding: PaddingValues) {
             ProductListScreen(
                 viewModel = productViewModel,
                 onAddClick = { navController.navigate("productForm") },
-                onEditClick = { product -> navController.navigate("productForm?productId=${product.id}") }
+                onEditClick = { product -> navController.navigate("productForm?productId=${product.id}") },
+                onChartClick = { navController.navigate("chart") }
             )
         }
         composable(
@@ -81,5 +82,12 @@ fun Navigation(innerPadding: PaddingValues) {
                 onCancel = { navController.popBackStack() }
             )
         }
+//        composable("chart") {
+//            val productViewModel: ProductViewModel = viewModel(factory = viewModelFactory)
+//            ChartScreen(
+//                viewModel = productViewModel,
+//                onBack = { navController.popBackStack() }
+//            )
+//        }
     }
 }

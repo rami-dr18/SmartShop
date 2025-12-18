@@ -1,5 +1,6 @@
 package com.example.smartshopv2.ui.screens
 
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +26,7 @@ fun ProductListScreen(
     viewModel: ProductViewModel = viewModel(),
     onAddClick: () -> Unit,
     onEditClick: (Product) -> Unit,
+    onChartClick: () -> Unit
 ) {
     val products by viewModel.products.collectAsState(initial = emptyList())
 
@@ -32,23 +34,105 @@ fun ProductListScreen(
         products = products,
         onAddClick = onAddClick,
         onEditClick = onEditClick,
-        onDeleteClick = { product -> viewModel.deleteProduct(product) }
+        onDeleteClick = { product -> viewModel.deleteProduct(product) },
+        onChartClick = onChartClick
     )
 }
 
+@Composable
+fun DashboardHeader(
+    totalProducts: Int,
+    totalStockValue: Double
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            DashboardItem(
+//                icon = Icons.Default.Inventory,
+                label = "Products",
+                value = totalProducts.toString(),
+                color = MaterialTheme.colorScheme.primary
+            )
+            
+            VerticalDivider(
+                modifier = Modifier
+                    .height(40.dp)
+                    .width(1.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
+            )
+
+            DashboardItem(
+//                icon = Icons.Default.AttachMoney,
+                label = "Total Value",
+                value = "$${String.format("%.2f", totalStockValue)}",
+                color = MaterialTheme.colorScheme.tertiary
+            )
+        }
+    }
+}
+
+@Composable
+fun DashboardItem(
+    label: String,
+    value: String,
+    color: Color
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
 
 @Composable
 fun ProductListContent(
     products: List<Product>,
     onAddClick: () -> Unit,
     onEditClick: (Product) -> Unit,
-    onDeleteClick: (Product) -> Unit
+    onDeleteClick: (Product) -> Unit,
+    onChartClick: () -> Unit
 ) {
+    // Calculate dashboard values
+    val totalProducts = products.size
+    val totalStockValue = products.sumOf { it.quantity * it.price }
+
     Scaffold(
-        // topBar = { TopAppBar(title = { Text("Products") }) },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddClick) {
-                Text("+")
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.End
+            ) {
+                FloatingActionButton(onClick = onChartClick) {
+                    Text("📊")
+                }
+                FloatingActionButton(onClick = onAddClick) {
+                    Text("+")
+                }
             }
         }
     ) { paddingValues ->
@@ -58,6 +142,13 @@ fun ProductListContent(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
+            item {
+                DashboardHeader(
+                    totalProducts = totalProducts,
+                    totalStockValue = totalStockValue
+                )
+            }
+            
             items(products) { product ->
                 ProductRow(
                     product = product,
@@ -167,7 +258,8 @@ fun ProductListScreenPreview() {
             products = sampleProducts,
             onAddClick = {},
             onEditClick = {},
-            onDeleteClick = {}
+            onDeleteClick = {},
+            onChartClick = {}
         )
     }
 }
